@@ -1,7 +1,7 @@
 import React from 'react';
 import IngredientEditMode from "./IngredientEditMode";
 import IngredientBox from "./IngredientBox";
-import RecipeList from "./RecipeList";
+
 
 class IngredientList extends React.Component {
 
@@ -23,6 +23,10 @@ class IngredientList extends React.Component {
         this.setState({ingredientEdit: false})
     }
 
+    newIngredientButtonGotClicked() {
+
+    }
+
     render() {
         if (this.state.ingredientEdit) {
             return (
@@ -38,6 +42,7 @@ class IngredientList extends React.Component {
             return (
                 <div class="container">
                     <h1 class="mt-5">What's in my fridge?</h1>
+                    <button onClick={this.newIngredientButtonGotClicked}>New Ingredient</button>
                     <div>
                         <IngredientBox callback={this.editButtonGotClicked} name={"Cheese"}>
                         </IngredientBox>
