@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS ingredients (
-	ingredient_id INT NOT NULL,
+	ingredient_id INT AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
     expiration_time_days INT NOT NULL,
     PRIMARY KEY (ingredient_id)
@@ -20,11 +20,26 @@ CREATE TABLE IF NOT EXISTS user_ingredients (
     ingredient_id INT NOT NULL,
     quantity INT NOT NULL,
     expiration_date DATE NOT NULL,
-    PRIMARY KEY (username, ingredient_id)
+    PRIMARY KEY (username, ingredient_id),
+    CONSTRAINT username_fk FOREIGN KEY (username) REFERENCES users (username)
+		ON DELETE CASCADE
+        ON UPDATE CASCADE
 );
 
+-- CREATE TABLE IF NOT EXISTS ingredients (
+-- 	ingredient_id INT NOT NULL,
+--     user_id VARCHAR(255) NOT NULL,
+--     name VARCHAR(255) NOT NULL,
+--     quantity INT NOT NULL,
+--     expiration_date DATE NOT NULL,
+--     PRIMARY KEY (ingredient_id),
+--     CONSTRAINT user_fk FOREIGN KEY (user_id) REFERENCES users (username)
+-- 		ON DELETE CASCADE
+--         ON UPDATE CASCADE
+-- );
+
 CREATE TABLE IF NOT EXISTS recipes (
-	recipe_id INT NOT NULL,
+	recipe_id INT AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
     description VARCHAR(255),
     preparation_time INT,
