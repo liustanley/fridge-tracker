@@ -1,5 +1,6 @@
 from flask import Flask, request, redirect, url_for, jsonify
 from flask_mysqldb import MySQL
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
 
@@ -7,6 +8,7 @@ app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'root'
 app.config['MYSQL_DB'] = 'fridge_tracker'
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 mysql = MySQL(app)
 
@@ -30,6 +32,7 @@ def hello_world():
 # Create user: POST: /api/users
 # Find users: GET: /api/users
 @app.route('/api/users', methods=['GET', 'POST'])
+@cross_origin()
 def users():
     if (request.method == 'GET'):
         cur = mysql.connection.cursor()
@@ -47,9 +50,17 @@ def users():
         cur.close()
         return user
 
+@app.route('/api/users/<username>', methods=['GET'])
+@cross_origin()
+def getUser(username):
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM users WHERE username='{}'".format(username))
+    return getJSON(cur)
+
 # Create ingredient: POST: /api/ingredients
 # Get ingredients: GET: /api/ingredients
 @app.route('/api/ingredients', methods=['GET', 'POST'])
+@cross_origin()
 def ingredients():
     if (request.method == 'GET'):
         cur = mysql.connection.cursor()
@@ -70,6 +81,7 @@ def ingredients():
 # Update ingredient: PUT: /api/ingredients/:iid
 # Delete ingredient: DELETE: /api/ingredients/:iid
 @app.route('/api/ingredients/<iid>', methods=['PUT', 'DELETE'])
+@cross_origin()
 def ingredientsId(iid):
     if (request.method == 'DELETE'):
         cur = mysql.connection.cursor()
@@ -97,6 +109,7 @@ def ingredientsId(iid):
 # Add ingredient to fridge: POST: /api/users/:username/ingredients
 # Get ingredients from fridge: GET: /api/users/:username/ingredients
 @app.route('/api/users/<username>/ingredients', methods=['GET', 'POST'])
+@cross_origin()
 def fridge(username):
     if (request.method == 'GET'):
         cur = mysql.connection.cursor()
@@ -118,6 +131,7 @@ def fridge(username):
 # Update fridge ingredient: PUT: /api/users/:username/ingredients/:iid
 # Delete fridge ingredient: DELETE: /api/users/:username/ingredients/:iid
 @app.route('/api/users/<username>/ingredients/<ingredient_id>', methods=['PUT', 'DELETE'])
+@cross_origin()
 def fridgeId(username, ingredient_id):
     if (request.method == 'DELETE'):
         cur = mysql.connection.cursor()
@@ -147,6 +161,7 @@ def fridgeId(username, ingredient_id):
 # Create recipe: POST: /api/users/:username/recipes
 # Get recipes: GET: /api/users/:username/recipes
 @app.route('/api/users/<username>/recipes', methods=['GET', 'POST'])
+@cross_origin()
 def recipes(username):
     if (request.method == 'GET'):
         cur = mysql.connection.cursor()
@@ -168,6 +183,7 @@ def recipes(username):
 # Update recipe: PUT: /api/users/:username/recipes/:rid
 # Delete recipe: DELETE: /api/users/:username/
 @app.route('/api/users/<username>/recipes/<recipe_id>', methods=['PUT', 'DELETE'])
+@cross_origin()
 def recipesId(username, recipe_id):
     if (request.method == 'DELETE'):
         cur = mysql.connection.cursor()
@@ -197,6 +213,7 @@ def recipesId(username, recipe_id):
 # Add ingredient to recipe: POST: /api/recipes/:rid/ingredients
 # Get recipe ingredients: GET: /api/recipes/:rid/ingredients
 @app.route('/api/recipes/<recipe_id>/ingredients', methods=['GET', 'POST'])
+@cross_origin()
 def recipeIngredients(recipe_id):
     if (request.method == 'GET'):
         cur = mysql.connection.cursor()
@@ -218,6 +235,7 @@ def recipeIngredients(recipe_id):
 # Update recipe ingredient: PUT: /api/recipes/:rid/ingredients/:iid
 # Delete recipe ingredient: DELETE: /api/recipes/:rid/ingredients/:iid
 @app.route('/api/recipes/<recipe_id>/ingredients/<ingredient_id>', methods=['DELETE', 'PUT'])
+@cross_origin()
 def recipeIngredientsId(recipe_id, ingredient_id):
     if (request.method == 'DELETE'):
         cur = mysql.connection.cursor()
