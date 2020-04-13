@@ -1,7 +1,8 @@
 import React from 'react';
-import { createUser } from "../services/UserService";
+import { findUserByUsername } from "../services/UserService";
+import { Link } from "react-router-dom";
 
-class Signup extends React.Component {
+class Login extends React.Component {
 
     constructor(props) {
         super(props);
@@ -11,7 +12,7 @@ class Signup extends React.Component {
             confirmPassword: ""
         };
         this.buttonGotClicked = this.buttonGotClicked.bind(this);
-        this.submitUser = this.submitUser.bind(this);
+        this.submitLogin = this.submitLogin.bind(this);
     }
 
     buttonGotClicked() {
@@ -23,15 +24,14 @@ class Signup extends React.Component {
         }
     }
 
-    submitUser() {
+    submitLogin() {
         if (this.state.password !== this.state.confirmPassword) {
             alert("Please make sure your passwords match.");
         } else {
-            createUser({
-                username: this.state.username,
-                password: this.state.password
-            }).then(user => {
-                this.props.history.push(`/home/${user.username}`)
+            findUserByUsername(this.state.username).then(user => {
+                if (user && user.length === 1 && user[0].password === this.state.password) {
+                    this.props.history.push(`/home/${user[0].username}`)
+                }
             })
         }
     }
@@ -39,7 +39,7 @@ class Signup extends React.Component {
     render() {
         return (
             <div class="container">
-                <h1 class="mt-5">Signup</h1>
+                <h1 class="mt-5">Log In</h1>
                 <form>
                     <div class="form-group">
                         <label for="formGroupExampleInput">Enter Username:</label>
@@ -57,10 +57,11 @@ class Signup extends React.Component {
                             type="text" class="form-control" id="confirmPassword" placeholder="Confirm Password" />
                     </div>
                 </form>
-                <button onClick={this.submitUser}>Create Account</button>
+
+                <button onClick={this.submitLogin}>Log In</button>
             </div>
         );
     }
 }
 
-export default Signup;
+export default Login;

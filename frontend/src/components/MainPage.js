@@ -21,7 +21,7 @@ class MainPage extends React.Component {
     render() {
         return (
             <div class="container">
-                <h1 class="ml-5">MY FRIDGE:</h1>
+                <h1 class="ml-5">{this.props.match.params.username}'s Fridge</h1>
                 <div class="row">
                     <div class="mr-5" >
                         <IngredientList>
