@@ -5,7 +5,7 @@ import AppRoutingContainer from "./containers/AppRoutingContainer";
 
 function App() {
   return (
-    <div className="App">
+    <div>
       <AppRoutingContainer></AppRoutingContainer>
     </div>
   );

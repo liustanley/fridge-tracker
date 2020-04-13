@@ -1,66 +1,123 @@
-import React from 'react';
+import React from "react";
 import IngredientEditMode from "./IngredientEditMode";
+import IngredientAddMode from "./IngredientAddMode";
+import IngredientNewMode from "./IngredientNewMode";
 import IngredientBox from "./IngredientBox";
-
+import {
+  updateUserIngredient,
+  deleteUserIngredient,
+  createUserIngredient,
+  createIngredient,
+} from "../services/IngredientService";
 
 class IngredientList extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      ingredientEdit: false,
+      ingredientAdd: false,
+      ingredientNew: false,
+      currentIngredient: {},
+    };
+    this.editButtonGotClicked = this.editButtonGotClicked.bind(this);
+    this.edit = this.edit.bind(this);
+    this.delete = this.delete.bind(this);
+    this.add = this.add.bind(this);
+    this.newIngredient = this.newIngredient.bind(this);
+  }
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            ingredientEdit: false,
-            currentIngredient: ""
-        };
-        this.editButtonGotClicked = this.editButtonGotClicked.bind(this);
-        this.doneButtonGotClicked = this.doneButtonGotClicked.bind(this);
-    }
+  editButtonGotClicked(input) {
+    this.setState({ ingredientEdit: true, currentIngredient: input });
+  }
 
-    editButtonGotClicked(input) {
-        this.setState({ingredientEdit: true, currentIngredient: input})
-    }
+  newIngredientButtonGotClicked() {}
 
-    doneButtonGotClicked() {
-        this.setState({ingredientEdit: false})
-    }
+  edit(userIngredient) {
+    updateUserIngredient(
+      userIngredient.ingredient_id,
+      userIngredient,
+      userIngredient.username
+    ).then(this.setState({ ingredientEdit: false }));
+  }
 
-    newIngredientButtonGotClicked() {
+  delete(userIngredient) {
+    deleteUserIngredient(
+      userIngredient.ingredient_id,
+      userIngredient.username
+    ).then(() => {
+      this.setState({ ingredientEdit: false });
+      this.props.refreshIngredients();
+    });
+  }
 
-    }
+  add(userIngredient) {
+    createUserIngredient(userIngredient, userIngredient.username).then(() => {
+      this.setState({ ingredientAdd: false });
+      this.props.refreshIngredients();
+    });
+  }
 
-    render() {
-        if (this.state.ingredientEdit) {
+  newIngredient(ingredient) {
+    createIngredient(ingredient).then(() => {
+      this.setState({ ingredientNew: false });
+    });
+  }
+
+  render() {
+    if (this.state.ingredientEdit) {
+      return (
+        <div>
+          <h1 class="mt-4">What's in my fridge?</h1>
+          <IngredientEditMode
+            edit={this.edit}
+            delete={this.delete}
+            userIngredient={this.state.currentIngredient}
+          />
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <h1 class="mt-4">What's in my fridge?</h1>
+          <button
+            className="btn btn-primary mr-3"
+            onClick={() => this.setState({ ingredientAdd: true })}
+          >
+            Add Ingredient to Fridge
+          </button>
+          <button
+            className="btn btn-secondary"
+            onClick={() => this.setState({ ingredientNew: true })}
+          >
+            New Ingredient
+          </button>
+          {this.state.ingredientAdd && (
+            <IngredientAddMode
+              add={this.add}
+              userIngredient={this.state.currentIngredient}
+              username={this.props.username}
+            />
+          )}
+          {this.state.ingredientNew && (
+            <IngredientNewMode
+              newIngredient={this.newIngredient}
+              userIngredient={this.state.currentIngredient}
+              username={this.props.username}
+            />
+          )}
+          {this.props.userIngredients.map((userIngredient) => {
             return (
-                <div class="container">
-                    <h1 class="mt-5">What's in my fridge?</h1>
-                    <div class="mb-5" style={{ width: 400, height: 100, borderColor: "Red" }}>
-                        <IngredientEditMode callback={this.doneButtonGotClicked} name={this.state.currentIngredient}>
-                        </IngredientEditMode>
-                    </div>
-                </div>
+              <IngredientBox
+                key={userIngredient.username + userIngredient.ingredient_id}
+                callback={this.editButtonGotClicked}
+                userIngredient={userIngredient}
+              />
             );
-        } else {
-            return (
-                <div class="container">
-                    <h1 class="mt-5">What's in my fridge?</h1>
-                    <button onClick={this.newIngredientButtonGotClicked}>New Ingredient</button>
-                    {this.props.userIngredients.map(userIngredient => {
-                        return (
-                            <IngredientBox callback={this.editButtonGotClicked} name={userIngredient.ingredient_id} />
-                        )
-                    })}
-                    {/* <div>
-                        <IngredientBox callback={this.editButtonGotClicked} name={"Cheese"}>
-                        </IngredientBox>
-                        <IngredientBox callback={this.editButtonGotClicked} name={"Carrots"}>
-                        </IngredientBox>
-                        <IngredientBox callback={this.editButtonGotClicked} name={"Milk"}>
-                        </IngredientBox>
-                    </div> */}
-                </div>
-
-            );
-        }
+          })}
+        </div>
+      );
     }
+  }
 }
 
 export default IngredientList;

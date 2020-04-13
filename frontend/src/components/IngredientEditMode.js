@@ -1,55 +1,70 @@
-import React from 'react';
+import React from "react";
 
 class IngredientEditMode extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      userIngredient: this.props.userIngredient,
+      ingredientEdit: false,
+      currentIngredient: "",
+      quantity: this.props.userIngredient.quantity,
+      expiration: this.props.userIngredient.expiration_date,
+    };
+  }
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            name: this.props.name,
-            ingredientEdit: false,
-            currentIngredient: ""
-        };
-    }
-
-    editButtonClick() {
-        //update the ingredient with the new values
-    }
-
-    deleteButtonClick() {
-        //delete the ingredient from the DB
-    }
-
-    render() {
-        return (
-            <div class="container">
-                <h1 class="mt-3">Edit Your Ingredient</h1>
-                <form>
-                    <div class="form-group">
-                        <label for="formGroupExampleInput">Ingredient:</label>
-                        <input onChange={e => this.setState({ username: e.target.value })}
-                            //change placeholder to whatever ingredient is
-                            type="text" class="form-control" id="ingredient" placeholder={this.state.name} />
-                    </div>
-                    <div class="form-group">
-                        <label for="formGroupExampleInput2">Quantity:</label>
-                        <input onChange={e => this.setState({ password: e.target.value })}
-                            //change placeholder to whatever ingredient is
-                            type="text" class="form-control" id="quantity" placeholder="" />
-                    </div>
-                    <div class="form-group">
-                        <label for="formGroupExampleInput2">Expiration Date:</label>
-                        <input onChange={e => this.setState({ confirmPassword: e.target.value })}
-                            //change placeholder to whatever ingredient is
-                            type="text" class="form-control" id="expirationDate" placeholder="" />
-                    </div>
-                </form>
-                <button style={{ marginRight: 10 }}
-                    onClick={() => { this.props.callback("IngredientEditMode") }}>Done</button>
-                <button style={{ marginLeft: 10 }}
-                    onClick={() => { this.props.callback("IngredientEditMode") }}>Delete Ingredient</button>
-            </div>
-        );
-    }
+  render() {
+    return (
+      <div class="ingredient-box">
+        <h3>Edit Ingredient: {this.state.userIngredient.name}</h3>
+        <form className="mt-2">
+          <div class="form-group">
+            <label for="formGroupExampleInput2">Quantity:</label>
+            <input
+              onChange={(e) =>
+                this.setState({ quantity: Number(e.target.value) })
+              }
+              type="number"
+              class="form-control"
+              id="quantity"
+              defaultValue={this.state.quantity}
+            />
+          </div>
+          <div class="form-group">
+            <label for="formGroupExampleInput2">Expiration Date:</label>
+            <input
+              onChange={(e) => this.setState({ expiration: e.target.value })}
+              type="date"
+              class="form-control"
+              id="expirationDate"
+              defaultValue={this.state.expiration}
+            />
+          </div>
+        </form>
+        <button
+          className="btn btn-success"
+          style={{ marginRight: 10 }}
+          onClick={() =>
+            this.props.edit({
+              ...this.state.userIngredient,
+              quantity: this.state.quantity,
+              expiration_date: this.state.expiration,
+            })
+          }
+        >
+          Done
+        </button>
+        <button
+          className="btn btn-danger"
+          style={{ marginLeft: 10 }}
+          onClick={() => {
+            this.props.delete(this.state.userIngredient);
+          }}
+        >
+          Delete Ingredient
+        </button>
+      </div>
+    );
+  }
 }
 
 export default IngredientEditMode;
