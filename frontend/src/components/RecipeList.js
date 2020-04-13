@@ -56,7 +56,12 @@ class RecipeList extends React.Component {
                     <button style={{ marginLeft: 10, marginRight: 10 }} onClick={this.allRecipesButtonClicked}>All Recipes</button>
                     <button style={{ marginLeft: 10, marginRight: 10 }} onClick={this.whatToEatButtonClicked}>What to eat?</button>
                     <div class="mb-5" style={{ width: 400, height: 100, borderColor: "Red" }}>
-                        <RecipeBox callback={this.editButtonGotClicked} name={"Cheese Omelette"}></RecipeBox>
+                        {this.props.recipes.map(recipe => {
+                            return (
+                                <RecipeBox callback={this.editButtonGotClicked} name={recipe.name}/>
+                            )
+                        })}
+                        {/* <RecipeBox callback={this.editButtonGotClicked} name={"Cheese Omelette"}></RecipeBox>
                         <RecipeBox callback={this.editButtonGotClicked} name={"Chocolate Milk"}></RecipeBox>
                         <RecipeBox callback={this.editButtonGotClicked} name={"Cake"}></RecipeBox>
                         <RecipeBox callback={this.editButtonGotClicked} name={"Cake"}></RecipeBox>
@@ -72,7 +77,7 @@ class RecipeList extends React.Component {
                         <RecipeBox callback={this.editButtonGotClicked} name={"Cake"}></RecipeBox>
                         <RecipeBox callback={this.editButtonGotClicked} name={"Cake"}></RecipeBox>
                         <RecipeBox callback={this.editButtonGotClicked} name={"Cake"}></RecipeBox>
-                        <RecipeBox callback={this.editButtonGotClicked} name={"Cake"}></RecipeBox>
+                        <RecipeBox callback={this.editButtonGotClicked} name={"Cake"}></RecipeBox> */}
                     </div>
                 </div>
             );

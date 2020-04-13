@@ -1,6 +1,8 @@
 import React from 'react';
 import RecipeList from "./RecipeList";
 import IngredientList from "./IngredientList";
+import { findAllUserIngredients } from "../services/IngredientService";
+import { findAllRecipesForUser } from "../services/RecipeService";
 
 class MainPage extends React.Component {
 
@@ -10,8 +12,20 @@ class MainPage extends React.Component {
             allRecipes: true,
             makeableRecipes: false,
             ingredientEditing: false,
-            recipeEditing: false
+            recipeEditing: false,
+            userIngredients: [],
+            recipes: []
         };
+    }
+
+    async componentDidMount() {
+        const userIngredients = await findAllUserIngredients(this.props.match.params.username);
+        const recipes = await findAllRecipesForUser(this.props.match.params.username);
+
+        this.setState({
+            userIngredients: userIngredients,
+            recipes: recipes
+        })
     }
 
     buttonGotClicked() {
@@ -24,14 +38,10 @@ class MainPage extends React.Component {
                 <h1 class="ml-5">{this.props.match.params.username}'s Fridge</h1>
                 <div class="row">
                     <div class="mr-5" >
-                        <IngredientList>
-
-                        </IngredientList>
+                        <IngredientList userIngredients={this.state.userIngredients} />
                     </div>
                     <div class="ml-5">
-                        <RecipeList>
-
-                        </RecipeList>
+                        <RecipeList recipes={this.state.recipes} />
                     </div>
                 </div>
             </div>

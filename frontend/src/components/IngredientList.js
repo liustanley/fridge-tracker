@@ -43,14 +43,19 @@ class IngredientList extends React.Component {
                 <div class="container">
                     <h1 class="mt-5">What's in my fridge?</h1>
                     <button onClick={this.newIngredientButtonGotClicked}>New Ingredient</button>
-                    <div>
+                    {this.props.userIngredients.map(userIngredient => {
+                        return (
+                            <IngredientBox callback={this.editButtonGotClicked} name={userIngredient.ingredient_id} />
+                        )
+                    })}
+                    {/* <div>
                         <IngredientBox callback={this.editButtonGotClicked} name={"Cheese"}>
                         </IngredientBox>
                         <IngredientBox callback={this.editButtonGotClicked} name={"Carrots"}>
                         </IngredientBox>
                         <IngredientBox callback={this.editButtonGotClicked} name={"Milk"}>
                         </IngredientBox>
-                    </div>
+                    </div> */}
                 </div>
 
             );
