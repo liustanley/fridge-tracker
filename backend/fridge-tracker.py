@@ -272,5 +272,22 @@ def recipeIngredientsId(recipe_id, ingredient_id):
         cur.close()
         return jsonify(data)
 
+# Add ingredient to recipe: POST: /api/recipes/:rid/ingredients
+# Get recipe ingredients: GET: /api/recipes/:rid/ingredients
+@app.route('/api/users/<username>/availablerecipes', methods=['GET'])
+def availableRecipes(username):
+    cur = mysql.connection.cursor()
+    cur.execute("CALL makeable_recipes('{}')".format(username))
+    return getJSON(cur)
+
+# Add ingredient to recipe: POST: /api/recipes/:rid/ingredients
+# Get recipe ingredients: GET: /api/recipes/:rid/ingredients
+@app.route('/api/recipes/<recipeId>/ingredients', methods=['GET'])
+def recipeIngredientList(recipeId):
+    cur = mysql.connection.cursor()
+    cur.execute("CALL recipes_ingredient_list({})".format(recipeId))
+    return getJSON(cur)
+    
+
 if __name__ == '__main__':
     app.run(debug=True)

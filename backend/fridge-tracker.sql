@@ -119,3 +119,42 @@ INSERT INTO recipe_ingredients (ingredient_id, recipe_id, amount) VALUES
     (10, 4, 1), (11, 4, 10), (12, 4, 1), (13, 4, 1),
     (10, 5, 1),
     (10, 6, 1);
+    
+    
+DELIMITER //
+CREATE PROCEDURE makeable_recipes(input_username VARCHAR(255))
+BEGIN
+SELECT recipe_id, name, description, preparation_time FROM
+	(SELECT num_ingredient_query.recipe_id, num_ingredient_query.name, num_ingredient_query.description, 
+    num_ingredient_query.preparation_time, num_ingredients, num_ingredients_can_make FROM
+		(SELECT recipe_id, name, description, preparation_time, COUNT(ingredient_id) as "num_ingredients" FROM 
+			(SELECT u.username, u.recipe_id, u.name, u.description, u.preparation_time, u.ingredient_id, u.amount, user_ingredients.quantity, user_ingredients.quantity >= u.amount as "can_make" FROM
+				(SELECT username, recipe_id, name, description, preparation_time, ingredient_id, amount FROM users NATURAL JOIN
+						(SELECT * FROM recipes NATURAL JOIN recipe_ingredients WHERE user_id = input_username) AS user_recipe_ingredients
+						WHERE username = input_username
+						GROUP BY ingredient_id, username, recipe_id) AS u
+				LEFT JOIN user_ingredients ON user_ingredients.ingredient_id = u.ingredient_id
+			WHERE user_ingredients.username = u.username) AS results
+		GROUP BY recipe_id) as num_ingredient_query
+	JOIN
+	(SELECT recipe_id, COUNT(can_make) as "num_ingredients_can_make" FROM
+		(SELECT u.username, u.recipe_id, u.name, u.description, u.preparation_time, u.ingredient_id, u.amount, user_ingredients.quantity, user_ingredients.quantity >= u.amount as "can_make" FROM
+			(SELECT username, recipe_id, name, description, preparation_time, ingredient_id, amount FROM users NATURAL JOIN
+					(SELECT * FROM recipes NATURAL JOIN recipe_ingredients WHERE user_id = input_username) AS user_recipe_ingredients
+					WHERE username = input_username
+					GROUP BY ingredient_id, username, recipe_id) AS u
+		LEFT JOIN user_ingredients ON user_ingredients.ingredient_id = u.ingredient_id
+		WHERE user_ingredients.username = u.username) AS results
+	WHERE can_make = 1
+	GROUP BY recipe_id) as num_can_make_query
+	ON num_ingredient_query.recipe_id = num_can_make_query.recipe_id) AS lastquery
+WHERE num_ingredients_can_make = num_ingredients;
+END
+//
+
+CREATE PROCEDURE recipes_ingredient_list(input_recipe_id INT)
+BEGIN
+SELECT ingredient_id, name, expiration_time_days FROM ingredients NATURAL JOIN recipe_ingredients
+WHERE recipe_id = input_recipe_id;
+END
+//
