@@ -332,7 +332,8 @@ def recipeIngredientList(recipeId):
 def favoriteRecipes(username):
     if (request.method == 'GET'):
         cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM favorite_recipes WHERE user_id={}".format(recipe_id))
+        cur.execute("SELECT * FROM recipes WHERE recipe_id IN "
+                    "(SELECT recipe_id FROM favorite_recipes WHERE user_id='{}')".format(username))
         return getJSON(cur)
     if (request.method == 'POST'):
         recipe = request.get_json()
@@ -344,8 +345,7 @@ def favoriteRecipes(username):
         data = testCur.fetchall()
         if (not (data)):
 
-            ins_st = '''INSERT INTO favorite_recipes (recipe_id, user_id) 
-                VALUES ({}, {})'''\
+            ins_st = '''INSERT INTO favorite_recipes (recipe_id, user_id) VALUES ({}, '{}') '''\
                 .format(recipe['recipe_id'], username)
             print(ins_st)
             cur.execute(ins_st)
