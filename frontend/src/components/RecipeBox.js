@@ -1,30 +1,28 @@
-import React from 'react';
+import React from "react";
 
 class RecipeBox extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            ingredientEdit: false,
-            currentIngredient: ""
-        };
-    }
-
-    editButtonClick() {
-        
-    }
-
-    render() {
-        return (
-            <div style={{ width: 500, height: 100, borderStyle: "solid", marginTop: 10, marginBottom: 10 }} class="row">
-                <h1>{this.props.name}</h1>
-                <button class="mr-1" style={{ marginLeft: 10 }} onClick={() => { this.props.callback(this.props.name) }}>Edit</button>
-            </div>
-        );
-    }
+  render() {
+    return (
+      <div class="ingredient-box">
+        <h4>{this.props.recipe.name}</h4>
+        <h5>Description: {this.props.recipe.description}</h5>
+        <h5>Preparation Time: {this.props.recipe.preparation_time}</h5>
+        <button
+          className="btn btn-outline-primary mt-2"
+          onClick={() => {
+            this.props.callback(this.props.recipe);
+          }}
+        >
+          Edit
+        </button>
+      </div>
+    );
+  }
 }
-
-
-
 
 export default RecipeBox;

@@ -49,12 +49,12 @@ class Signup extends React.Component {
                     <div class="form-group">
                         <label for="formGroupExampleInput2">Enter Password:</label>
                         <input onChange={e => this.setState({ password: e.target.value })}
-                            type="text" class="form-control" id="enterPassword" placeholder="Password" />
+                            type="password" class="form-control" id="enterPassword" placeholder="Password" />
                     </div>
                     <div class="form-group">
                         <label for="formGroupExampleInput2">Confirm Password:</label>
                         <input onChange={e => this.setState({ confirmPassword: e.target.value })}
-                            type="text" class="form-control" id="confirmPassword" placeholder="Confirm Password" />
+                            type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password" />
                     </div>
                 </form>
                 <button onClick={this.submitUser}>Create Account</button>

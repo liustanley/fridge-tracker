@@ -1,54 +1,80 @@
-import React from 'react';
+import React from "react";
 
 class RecipeEditMode extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      recipe: this.props.recipe,
+      name: this.props.recipe.name,
+      description: this.props.recipe.description,
+      preparation_time: this.props.recipe.preparation_time
+    };
+  }
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            name: this.props.name,
-            currentIngredient: ""
-        };
-    }
-
-    editButtonClick() {
-        //update the ingredient with the new values
-    }
-
-    deleteButtonClick() {
-        //delete the ingredient from the DB
-    }
-
-    render() {
-        return (
-            <div class="container">
-                <h1 class="mt-3">Edit Your Recipe</h1>
-                <form>
-                    <div class="form-group">
-                        <label for="formGroupExampleInput">Recipe:</label>
-                        <input onChange={e => this.setState({ username: e.target.value })}
-                            //change placeholder to whatever Recipe is
-                            type="text" class="form-control" id="recipe" placeholder={this.state.name} />
-                    </div>
-                    <div class="form-group">
-                        <label for="formGroupExampleInput2">Description:</label>
-                        <input onChange={e => this.setState({ password: e.target.value })}
-                            //change placeholder to whatever Description is
-                            type="text" class="form-control" id="description" placeholder="" />
-                    </div>
-                    <div class="form-group">
-                        <label for="formGroupExampleInput2">Preparation Time:</label>
-                        <input onChange={e => this.setState({ confirmPassword: e.target.value })}
-                            //change placeholder to whatever Prep time is
-                            type="text" class="form-control" id="preparationTime" placeholder="" />
-                    </div>
-                </form>
-                <button style={{ marginRight: 10 }}
-                    onClick={() => { this.props.callback("RecipeEditMode") }}>Done</button>
-                <button style={{ marginLeft: 10 }}
-                    onClick={() => { this.props.callback("RecipeEditMode") }}>Delete Recipe</button>
-            </div>
-        );
-    }
+  render() {
+    return (
+      <div class="ingredient-box">
+        <h3>Edit Recipe: {this.state.name}</h3>
+        <form className="mt-2">
+          <div class="form-group">
+            <label for="formGroupExampleInput2">Name:</label>
+            <input
+              onChange={(e) =>
+                this.setState({ name: e.target.value })
+              }
+              type="text"
+              class="form-control"
+              id="name"
+              defaultValue={this.state.name}
+            />
+          </div>
+          <div class="form-group">
+            <label for="formGroupExampleInput2">Description:</label>
+            <input
+              onChange={(e) => this.setState({ description: e.target.value })}
+              type="text"
+              class="form-control"
+              id="desc"
+              defaultValue={this.state.description}
+            />
+          </div>
+          <div class="form-group">
+            <label for="formGroupExampleInput2">Preparation Time (min):</label>
+            <input
+              onChange={(e) => this.setState({ preparation_time: Number(e.target.value) })}
+              type="number"
+              class="form-control"
+              id="prep"
+              defaultValue={this.state.preparation_time}
+            />
+          </div>
+        </form>
+        <button
+          className="btn btn-success"
+          style={{ marginRight: 10 }}
+          onClick={() =>
+            this.props.edit({
+              ...this.state.recipe,
+              name: this.state.name,
+              description: this.state.description,
+              preparation_time: this.state.preparation_time
+            })
+          }
+        >
+          Done
+        </button>
+        <button
+          className="btn btn-danger"
+          style={{ marginLeft: 10 }}
+          onClick={() => {
+            this.props.delete(this.state.recipe);
+          }}
+        >
+          Delete Recipe
+        </button>
+      </div>
+    );
+  }
 }
 
 export default RecipeEditMode;

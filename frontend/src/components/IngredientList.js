@@ -37,7 +37,10 @@ class IngredientList extends React.Component {
       userIngredient.ingredient_id,
       userIngredient,
       userIngredient.username
-    ).then(this.setState({ ingredientEdit: false }));
+    ).then(() => {
+      this.setState({ ingredientEdit: false })
+      this.props.refreshIngredients();
+    });
   }
 
   delete(userIngredient) {

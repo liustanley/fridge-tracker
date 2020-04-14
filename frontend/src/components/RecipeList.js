@@ -1,88 +1,109 @@
-import React from 'react';
+import React from "react";
 import RecipeBox from "./RecipeBox";
 import RecipeEditMode from "./RecipeEditMode";
+import RecipeNewMode from "./RecipeNewMode";
+import { updateRecipe, deleteRecipe } from "../services/RecipeService";
 
 class RecipeList extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      recipeEdit: false,
+      recipeNew: false,
+      currentRecipe: {},
+    };
+    this.editButtonGotClicked = this.editButtonGotClicked.bind(this);
+    this.doneButtonGotClicked = this.doneButtonGotClicked.bind(this);
+    this.edit = this.edit.bind(this);
+    this.delete = this.delete.bind(this);
+  }
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            recipeEdit: false,
-            currentRecipe: ""
-        };
-        this.editButtonGotClicked = this.editButtonGotClicked.bind(this);
-        this.doneButtonGotClicked = this.doneButtonGotClicked.bind(this);
-    }
+  edit(recipe) {
+    updateRecipe(recipe.recipe_id, recipe, recipe.user_id).then(() => {
+      this.setState({ recipeEdit: false });
+      this.props.refreshRecipes();
+    });
+  }
 
-    addButtonClicked() {
-        //this.setState({recipeEdit: true, currentRecipe: ""});
-    }
+  delete(recipe) {
+    deleteRecipe(recipe.recipe_id, recipe.user_id).then(() => {
+      this.setState({ recipeEdit: false });
+      this.props.refreshRecipes();
+    });
+  }
 
-    allRecipesButtonClicked() {
+  addButtonClicked() {
+    //this.setState({recipeEdit: true, currentRecipe: ""});
+  }
 
-    }
+  allRecipesButtonClicked() {}
 
-    whatToEatButtonClicked() {
+  whatToEatButtonClicked() {}
 
-    }
+  editButtonGotClicked(input) {
+    this.setState({ recipeEdit: true, currentRecipe: input });
+  }
 
-    editButtonGotClicked(input) {
-        this.setState({recipeEdit: true, currentRecipe: input})
-    }
+  doneButtonGotClicked() {
+    this.setState({ recipeEdit: false });
+  }
 
-    doneButtonGotClicked() {
-        this.setState({recipeEdit: false})
-    }
+  render() {
+    if (this.state.recipeEdit) {
+      return (
+        <div>
+          <h1 class="mt-4">My Recipes</h1>
+          <RecipeEditMode
+            callback={this.doneButtonGotClicked}
+            recipe={this.state.currentRecipe}
+            edit={this.edit}
+            delete={this.delete}
+          ></RecipeEditMode>
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <h1 class="mt-4">My Recipes</h1>
+          <button
+            className="btn btn-primary mr-3"
+            onClick={() => this.setState({ recipeNew: true })}
+          >
+            New Recipe
+          </button>
+          <button
+            className="btn btn-secondary mr-3"
+            onClick={this.allRecipesButtonClicked}
+          >
+            All Recipes
+          </button>
+          <button
+            className="btn btn-success"
+            onClick={this.whatToEatButtonClicked}
+          >
+            What to eat?
+          </button>
 
-    render() {
-        if (this.state.recipeEdit) {
+          {this.state.recipeNew && (
+            <RecipeNewMode
+              newRecipe={this.newRecipe}
+              username={this.props.username}
+            />
+          )}
+
+          {this.props.recipes.map((recipe) => {
             return (
-                <div class="container">
-                    <h1 class="mt-5">My Recipes</h1>
-                    <div class="mb-5" style={{ width: 400, height: 100, borderColor: "Red" }}>
-                        <RecipeEditMode callback={this.doneButtonGotClicked} name={this.state.currentRecipe}>
-                        </RecipeEditMode>
-                    </div>
-                </div>
+              <RecipeBox
+                key={recipe.user_id + recipe.recipe_id}
+                callback={this.editButtonGotClicked}
+                recipe={recipe}
+              />
             );
-        } else {
-            return (
-                <div class="container">
-                    <h1 class="mt-5">My Recipes</h1>
-                    {
-                    // for some reason, this new recipe button gets continuously clicked
-                    }
-                    <button style={{ marginLeft: 10, marginRight: 10 }} onClick={this.addButtonClicked}>New Recipe</button>
-                    <button style={{ marginLeft: 10, marginRight: 10 }} onClick={this.allRecipesButtonClicked}>All Recipes</button>
-                    <button style={{ marginLeft: 10, marginRight: 10 }} onClick={this.whatToEatButtonClicked}>What to eat?</button>
-                    <div class="mb-5" style={{ width: 400, height: 100, borderColor: "Red" }}>
-                        {this.props.recipes.map(recipe => {
-                            return (
-                                <RecipeBox callback={this.editButtonGotClicked} name={recipe.name}/>
-                            )
-                        })}
-                        {/* <RecipeBox callback={this.editButtonGotClicked} name={"Cheese Omelette"}></RecipeBox>
-                        <RecipeBox callback={this.editButtonGotClicked} name={"Chocolate Milk"}></RecipeBox>
-                        <RecipeBox callback={this.editButtonGotClicked} name={"Cake"}></RecipeBox>
-                        <RecipeBox callback={this.editButtonGotClicked} name={"Cake"}></RecipeBox>
-                        <RecipeBox callback={this.editButtonGotClicked} name={"Cake"}></RecipeBox>
-                        <RecipeBox callback={this.editButtonGotClicked} name={"Cake"}></RecipeBox>
-                        <RecipeBox callback={this.editButtonGotClicked} name={"Cake"}></RecipeBox>
-                        <RecipeBox callback={this.editButtonGotClicked} name={"Cake"}></RecipeBox>
-                        <RecipeBox callback={this.editButtonGotClicked} name={"Cake"}></RecipeBox>
-                        <RecipeBox callback={this.editButtonGotClicked} name={"Cake"}></RecipeBox>
-                        <RecipeBox callback={this.editButtonGotClicked} name={"Cake"}></RecipeBox>
-                        <RecipeBox callback={this.editButtonGotClicked} name={"Cake"}></RecipeBox>
-                        <RecipeBox callback={this.editButtonGotClicked} name={"Cake"}></RecipeBox>
-                        <RecipeBox callback={this.editButtonGotClicked} name={"Cake"}></RecipeBox>
-                        <RecipeBox callback={this.editButtonGotClicked} name={"Cake"}></RecipeBox>
-                        <RecipeBox callback={this.editButtonGotClicked} name={"Cake"}></RecipeBox>
-                        <RecipeBox callback={this.editButtonGotClicked} name={"Cake"}></RecipeBox> */}
-                    </div>
-                </div>
-            );
-        }
+          })}
+        </div>
+      );
     }
+  }
 }
 
 export default RecipeList;

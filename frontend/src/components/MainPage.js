@@ -17,6 +17,7 @@ class MainPage extends React.Component {
       recipes: [],
     };
     this.refreshIngredients = this.refreshIngredients.bind(this);
+    this.refreshRecipes = this.refreshRecipes.bind(this);
   }
 
   async componentDidMount() {
@@ -43,6 +44,16 @@ class MainPage extends React.Component {
     });
   }
 
+  async refreshRecipes() {
+    const recipes = await findAllRecipesForUser(
+      this.props.match.params.username
+    );
+
+    this.setState({
+      recipes: recipes,
+    });
+  }
+
   render() {
     return (
       <div>
@@ -65,7 +76,11 @@ class MainPage extends React.Component {
               />
             </div>
             <div class="ml-5">
-              <RecipeList recipes={this.state.recipes} />
+              <RecipeList
+                recipes={this.state.recipes}
+                refreshRecipes={this.refreshRecipes}
+                username={this.props.match.params.username}
+              />
             </div>
           </div>
         </div>
