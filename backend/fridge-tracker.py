@@ -189,10 +189,10 @@ def recipes(username):
             .format(recipe['name'], recipe['description'], recipe['preparation_time'], username)
         print(ins_st)
         cur.execute(ins_st)
-
         mysql.connection.commit()
-        cur.close()
-        return recipe
+
+        cur.execute("SELECT * FROM recipes WHERE user_id='{}' AND name='{}'".format(username, recipe['name']))
+        return getJSON(cur)
 
 # Update recipe: PUT: /api/users/:username/recipes/:rid
 # Delete recipe: DELETE: /api/users/:username/

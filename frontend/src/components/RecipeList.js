@@ -2,7 +2,7 @@ import React from "react";
 import RecipeBox from "./RecipeBox";
 import RecipeEditMode from "./RecipeEditMode";
 import RecipeNewMode from "./RecipeNewMode";
-import { updateRecipe, deleteRecipe } from "../services/RecipeService";
+import { updateRecipe, deleteRecipe, createRecipeForUser } from "../services/RecipeService";
 
 class RecipeList extends React.Component {
   constructor(props) {
@@ -16,6 +16,7 @@ class RecipeList extends React.Component {
     this.doneButtonGotClicked = this.doneButtonGotClicked.bind(this);
     this.edit = this.edit.bind(this);
     this.delete = this.delete.bind(this);
+    this.add = this.add.bind(this);
   }
 
   edit(recipe) {
@@ -32,20 +33,19 @@ class RecipeList extends React.Component {
     });
   }
 
-  addButtonClicked() {
-    //this.setState({recipeEdit: true, currentRecipe: ""});
-  }
-
-  allRecipesButtonClicked() {}
-
-  whatToEatButtonClicked() {}
-
   editButtonGotClicked(input) {
     this.setState({ recipeEdit: true, currentRecipe: input });
   }
 
   doneButtonGotClicked() {
     this.setState({ recipeEdit: false });
+  }
+
+  add(recipe) {
+    createRecipeForUser(recipe, this.props.username).then(() => {
+      this.setState({ recipeNew: false });
+      this.props.refreshRecipes();
+    });
   }
 
   render() {
@@ -86,8 +86,8 @@ class RecipeList extends React.Component {
 
           {this.state.recipeNew && (
             <RecipeNewMode
-              newRecipe={this.newRecipe}
               username={this.props.username}
+              add={this.add}
             />
           )}
 

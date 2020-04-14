@@ -6,8 +6,15 @@ class RecipeNewMode extends React.Component {
     super(props);
     this.state = {
       name: "",
-      expiration_time_days: 0,
+      description: "",
+      preparation_time: 0,
     };
+  }
+
+  componentDidMount() {
+    findAllIngredients().then((ingredients) =>
+      this.setState({ ingredients: ingredients })
+    );
   }
 
   render() {
@@ -25,26 +32,40 @@ class RecipeNewMode extends React.Component {
               defaultValue={this.state.name}
             />
           </div>
+
           <div class="form-group">
-            <label for="formGroupExampleInput2">Expiration Time (Days):</label>
+            <label for="formGroupExampleInput2">Description:</label>
+            <textarea
+              type="text"
+              class="form-control"
+              onChange={(e) => this.setState({ description: e.target.value })}
+              defaultValue={this.state.description}
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="formGroupExampleInput2">Preparation Time:</label>
             <input
-              onChange={(e) => this.setState({ expiration_time_days: e.target.value })}
+              onChange={(e) =>
+                this.setState({ preparation_time: e.target.value })
+              }
               type="number"
               class="form-control"
               id="expirationTime"
-              defaultValue={this.state.expiration_time_days}
+              defaultValue={this.state.preparation_time}
             />
           </div>
         </form>
         <button
           className="btn btn-success"
           style={{ marginRight: 10 }}
-          onClick={() =>
-            this.props.newIngredient({
+          onClick={() => {
+            this.props.add({
               name: this.state.name,
-              expiration_time_days: this.state.expiration_time_days
-            })
-          }
+              description: this.state.description,
+              preparation_time: this.state.preparation_time,
+            });
+          }}
         >
           Create
         </button>

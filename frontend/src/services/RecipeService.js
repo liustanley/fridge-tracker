@@ -31,3 +31,17 @@ export const deleteRecipe = async (id, username) => {
   });
   return await response.json();
 };
+
+export const findAllIngredientsForRecipe = async (recipeId) => {
+  const response = await fetch(`${API_URL}/recipes/${recipeId}/ingredients`);
+  return await response.json();
+}
+
+export const addIngredientToRecipe = async (recipeId, ingredient) => 
+  fetch(`${API_URL}/recipes/${recipeId}/ingredients`, {
+    method: "POST",
+    body: JSON.stringify(ingredient),
+    headers: {
+      "content-type": "application/json",
+    },
+  }).then((response) => response.json());
