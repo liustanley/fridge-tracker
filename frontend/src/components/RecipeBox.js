@@ -1,13 +1,12 @@
 import React from "react";
-import {
-  findAllIngredientsForRecipe,
-} from "../services/RecipeService";
+import { findAllIngredientsForRecipe } from "../services/RecipeService";
 
 class RecipeBox extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      recipeIngredients: []
+      recipeIngredients: [],
+      favorite: this.props.favorite,
     };
   }
 
@@ -39,14 +38,27 @@ class RecipeBox extends React.Component {
         >
           Edit
         </button>
-        <button
-          className="btn btn-outline-danger ml-3 mt-2"
-          onClick={() => {
-            this.props.addFavorite(this.props.recipe);
-          }}
-        >
-          Favorite
-        </button>
+        {!this.state.favorite && (
+          <button
+            className="btn btn-outline-danger ml-3 mt-2"
+            onClick={() => {
+              this.props.addFavorite(this.props.recipe);
+              this.setState({
+                favorite: true,
+              });
+            }}
+          >
+            Favorite
+          </button>
+        )}
+        {this.state.favorite && (
+          <button
+            className="btn btn-outline-danger disabled ml-3 mt-2"
+            disabled
+          >
+            Favorited
+          </button>
+        )}
       </div>
     );
   }

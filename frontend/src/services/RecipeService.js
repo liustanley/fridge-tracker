@@ -52,10 +52,15 @@ export const findAvailableRecipesForUser = async (username) => {
 };
 
 export const createFavoriteRecipe = async (recipe, username) =>
-  fetch(`${API_URL}/user/${username}/favoriterecipes`, {
+  fetch(`${API_URL}/users/${username}/favoriterecipes`, {
     method: "POST",
     body: JSON.stringify(recipe),
     headers: {
       "content-type": "application/json",
     },
   }).then((response) => response.json());
+
+export const findFavoriteRecipesForUser = async (username) => {
+  const response = await fetch(`${API_URL}/users/${username}/favoriterecipes`);
+  return await response.json();
+}

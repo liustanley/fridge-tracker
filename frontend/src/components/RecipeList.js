@@ -2,7 +2,7 @@ import React from "react";
 import RecipeBox from "./RecipeBox";
 import RecipeEditMode from "./RecipeEditMode";
 import RecipeNewMode from "./RecipeNewMode";
-import { updateRecipe, deleteRecipe, createRecipeForUser, createFavoriteRecipe } from "../services/RecipeService";
+import { updateRecipe, deleteRecipe, createRecipeForUser, createFavoriteRecipe, findFavoriteRecipesForUser } from "../services/RecipeService";
 
 class RecipeList extends React.Component {
   constructor(props) {
@@ -11,7 +11,8 @@ class RecipeList extends React.Component {
       recipeEdit: false,
       recipeNew: false,
       currentRecipe: {},
-      whatToEat: false
+      whatToEat: false,
+      favorites: []
     };
     this.editButtonGotClicked = this.editButtonGotClicked.bind(this);
     this.doneButtonGotClicked = this.doneButtonGotClicked.bind(this);
@@ -19,6 +20,17 @@ class RecipeList extends React.Component {
     this.delete = this.delete.bind(this);
     this.add = this.add.bind(this);
     this.addFavorite = this.addFavorite.bind(this);
+  }
+
+  componentDidMount() {
+    findFavoriteRecipesForUser(this.props.username)
+      .then(favorites => {
+        let favoriteIds = []
+        for (let recipe of favorites) {
+          favoriteIds.push(recipe.recipe_id)
+        }
+        this.setState({favorites: favoriteIds})
+      })
   }
 
   edit(recipe) {
@@ -110,6 +122,7 @@ class RecipeList extends React.Component {
                 callback={this.editButtonGotClicked}
                 recipe={recipe}
                 addFavorite={this.addFavorite}
+                favorite={this.state.favorites.includes(recipe.recipe_id)}
               />
             );
           })}

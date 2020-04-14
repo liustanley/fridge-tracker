@@ -2,7 +2,7 @@ import React from "react";
 import RecipeList from "./RecipeList";
 import IngredientList from "./IngredientList";
 import { findAllUserIngredients } from "../services/IngredientService";
-import { findAllRecipesForUser, findAvailableRecipesForUser } from "../services/RecipeService";
+import { findAllRecipesForUser, findAvailableRecipesForUser, findFavoriteRecipesForUser } from "../services/RecipeService";
 import { Link } from "react-router-dom";
 
 class MainPage extends React.Component {
@@ -19,6 +19,7 @@ class MainPage extends React.Component {
     this.refreshIngredients = this.refreshIngredients.bind(this);
     this.refreshRecipes = this.refreshRecipes.bind(this);
     this.refreshAvailableRecipes = this.refreshAvailableRecipes.bind(this);
+    this.refreshFavoriteRecipes = this.refreshFavoriteRecipes.bind(this);
   }
 
   async componentDidMount() {
@@ -65,6 +66,16 @@ class MainPage extends React.Component {
     });
   }
 
+  async refreshFavoriteRecipes() {
+    const recipes = await findFavoriteRecipesForUser(
+      this.props.match.params.username
+    );
+
+    this.setState({
+      recipes: recipes,
+    });
+  }
+
   render() {
     return (
       <div>
@@ -91,6 +102,7 @@ class MainPage extends React.Component {
                 recipes={this.state.recipes}
                 refreshRecipes={this.refreshRecipes}
                 refreshAvailableRecipes={this.refreshAvailableRecipes}
+                refreshFavoriteRecipes={this.refreshFavoriteRecipes}
                 username={this.props.match.params.username}
               />
             </div>
