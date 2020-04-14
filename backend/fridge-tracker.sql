@@ -51,6 +51,18 @@ CREATE TABLE IF NOT EXISTS recipe_ingredients (
         ON UPDATE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS favorite_recipes (
+	recipe_id INT NOT NULL,
+    user_id VARCHAR(255) NOT NULL,
+    PRIMARY KEY (recipe_id, user_id),
+    CONSTRAINT recipeid_fk FOREIGN KEY (recipe_id) REFERENCES recipes (recipe_id)
+		ON DELETE CASCADE
+        ON UPDATE CASCADE,
+	CONSTRAINT userid_fk FOREIGN KEY (user_id) REFERENCES recipes (user_id)
+		ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
 INSERT INTO users (username, password) VALUES 
 	('clairesaffitz', 'downwithbrad'),
 	('bradleone', 'bradrocks23'),
@@ -124,31 +136,45 @@ INSERT INTO recipe_ingredients (ingredient_id, recipe_id, amount) VALUES
 DELIMITER //
 CREATE PROCEDURE makeable_recipes(input_username VARCHAR(255))
 BEGIN
-SELECT recipe_id, name, description, preparation_time FROM
-	(SELECT num_ingredient_query.recipe_id, num_ingredient_query.name, num_ingredient_query.description, 
-    num_ingredient_query.preparation_time, num_ingredients, num_ingredients_can_make FROM
-		(SELECT recipe_id, name, description, preparation_time, COUNT(ingredient_id) as "num_ingredients" FROM 
+SELECT * FROM recipes
+WHERE recipe_id IN
+(SELECT recipe_id FROM
+	(SELECT num_ingredient_query.recipe_id, num_ingredients, num_ingredients_can_make FROM
+		(SELECT recipe_id, COUNT(ingredient_id) as "num_ingredients" FROM 
 			(SELECT u.username, u.recipe_id, u.name, u.description, u.preparation_time, u.ingredient_id, u.amount, user_ingredients.quantity, user_ingredients.quantity >= u.amount as "can_make" FROM
 				(SELECT username, recipe_id, name, description, preparation_time, ingredient_id, amount FROM users NATURAL JOIN
 						(SELECT * FROM recipes NATURAL JOIN recipe_ingredients WHERE user_id = input_username) AS user_recipe_ingredients
 						WHERE username = input_username
 						GROUP BY ingredient_id, username, recipe_id) AS u
 				LEFT JOIN user_ingredients ON user_ingredients.ingredient_id = u.ingredient_id
-			WHERE user_ingredients.username = u.username) AS results
+			WHERE user_ingredients.username = u.username
+			UNION
+			SELECT u.username, u.recipe_id, u.name, u.description, u.preparation_time, u.ingredient_id, u.amount, 0 as "quantity", 0 as "can_make" FROM
+				(SELECT username, recipe_id, name, description, preparation_time, ingredient_id, amount FROM users NATURAL JOIN
+						(SELECT * FROM recipes NATURAL JOIN recipe_ingredients WHERE user_id = input_username) AS user_recipe_ingredients
+						WHERE username = input_username
+						GROUP BY ingredient_id, username, recipe_id) AS u
+			WHERE u.ingredient_id NOT IN (SELECT ingredient_id FROM user_ingredients WHERE username = input_username)) AS results
 		GROUP BY recipe_id) as num_ingredient_query
 	JOIN
-	(SELECT recipe_id, COUNT(can_make) as "num_ingredients_can_make" FROM
+	(SELECT recipe_id, SUM(can_make) as "num_ingredients_can_make" FROM
 		(SELECT u.username, u.recipe_id, u.name, u.description, u.preparation_time, u.ingredient_id, u.amount, user_ingredients.quantity, user_ingredients.quantity >= u.amount as "can_make" FROM
 			(SELECT username, recipe_id, name, description, preparation_time, ingredient_id, amount FROM users NATURAL JOIN
 					(SELECT * FROM recipes NATURAL JOIN recipe_ingredients WHERE user_id = input_username) AS user_recipe_ingredients
 					WHERE username = input_username
 					GROUP BY ingredient_id, username, recipe_id) AS u
-		LEFT JOIN user_ingredients ON user_ingredients.ingredient_id = u.ingredient_id
-		WHERE user_ingredients.username = u.username) AS results
-	WHERE can_make = 1
+			LEFT JOIN user_ingredients ON user_ingredients.ingredient_id = u.ingredient_id
+		WHERE user_ingredients.username = u.username
+		UNION
+		SELECT u.username, u.recipe_id, u.name, u.description, u.preparation_time, u.ingredient_id, u.amount, 0 as "quantity", 0 as "can_make" FROM
+			(SELECT username, recipe_id, name, description, preparation_time, ingredient_id, amount FROM users NATURAL JOIN
+					(SELECT * FROM recipes NATURAL JOIN recipe_ingredients WHERE user_id = input_username) AS user_recipe_ingredients
+					WHERE username = input_username
+					GROUP BY ingredient_id, username, recipe_id) AS u
+		WHERE u.ingredient_id NOT IN (SELECT ingredient_id FROM user_ingredients WHERE username = input_username)) AS results
 	GROUP BY recipe_id) as num_can_make_query
 	ON num_ingredient_query.recipe_id = num_can_make_query.recipe_id) AS lastquery
-WHERE num_ingredients_can_make = num_ingredients;
+WHERE num_ingredients_can_make = num_ingredients);
 END
 //
 
