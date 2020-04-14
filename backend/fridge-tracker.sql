@@ -120,6 +120,9 @@ INSERT INTO recipe_ingredients (ingredient_id, recipe_id, amount) VALUES
     (10, 5, 1),
     (10, 6, 1);
     
+INSERT INTO favorite_recipes (recipe_id, user_id) VALUES
+	(2, 'clairesaffitz'), (3, 'stanleyliu'), (4, 'mollybaz');
+    
     
 DELIMITER //
 CREATE PROCEDURE makeable_recipes(input_username VARCHAR(255))
