@@ -154,7 +154,7 @@ END
 
 CREATE PROCEDURE recipes_ingredient_list(input_recipe_id INT)
 BEGIN
-SELECT ingredient_id, name, expiration_time_days FROM ingredients NATURAL JOIN recipe_ingredients
+SELECT ingredients.name, recipe_ingredients.ingredient_id, recipe_ingredients.recipe_id, recipe_ingredients.amount FROM ingredients NATURAL JOIN recipe_ingredients
 WHERE recipe_id = input_recipe_id;
 END
 //
