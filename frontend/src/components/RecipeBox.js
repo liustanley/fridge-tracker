@@ -39,6 +39,14 @@ class RecipeBox extends React.Component {
         >
           Edit
         </button>
+        <button
+          className="btn btn-outline-danger ml-3 mt-2"
+          onClick={() => {
+            this.props.addFavorite(this.props.recipe);
+          }}
+        >
+          Favorite
+        </button>
       </div>
     );
   }

@@ -2,7 +2,7 @@ import React from "react";
 import RecipeBox from "./RecipeBox";
 import RecipeEditMode from "./RecipeEditMode";
 import RecipeNewMode from "./RecipeNewMode";
-import { updateRecipe, deleteRecipe, createRecipeForUser } from "../services/RecipeService";
+import { updateRecipe, deleteRecipe, createRecipeForUser, createFavoriteRecipe } from "../services/RecipeService";
 
 class RecipeList extends React.Component {
   constructor(props) {
@@ -11,12 +11,14 @@ class RecipeList extends React.Component {
       recipeEdit: false,
       recipeNew: false,
       currentRecipe: {},
+      whatToEat: false
     };
     this.editButtonGotClicked = this.editButtonGotClicked.bind(this);
     this.doneButtonGotClicked = this.doneButtonGotClicked.bind(this);
     this.edit = this.edit.bind(this);
     this.delete = this.delete.bind(this);
     this.add = this.add.bind(this);
+    this.addFavorite = this.addFavorite.bind(this);
   }
 
   edit(recipe) {
@@ -48,6 +50,10 @@ class RecipeList extends React.Component {
     });
   }
 
+  addFavorite(recipe) {
+    createFavoriteRecipe({recipe_id: recipe.recipe_id}, this.props.username)
+  }
+
   render() {
     if (this.state.recipeEdit) {
       return (
@@ -73,13 +79,19 @@ class RecipeList extends React.Component {
           </button>
           <button
             className="btn btn-secondary mr-3"
-            onClick={this.allRecipesButtonClicked}
+            onClick={this.props.refreshRecipes}
           >
             All Recipes
           </button>
           <button
+            className="btn btn-danger mr-3"
+            onClick={this.props.refreshFavoriteRecipes}
+          >
+            Favorite Recipes
+          </button>
+          <button
             className="btn btn-success"
-            onClick={this.whatToEatButtonClicked}
+            onClick={this.props.refreshAvailableRecipes}
           >
             What to eat?
           </button>
@@ -94,9 +106,10 @@ class RecipeList extends React.Component {
           {this.props.recipes.map((recipe) => {
             return (
               <RecipeBox
-                key={recipe.user_id + recipe.recipe_id}
+                key={recipe.user_id + recipe.recipe_id + recipe.name}
                 callback={this.editButtonGotClicked}
                 recipe={recipe}
+                addFavorite={this.addFavorite}
               />
             );
           })}

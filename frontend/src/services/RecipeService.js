@@ -19,15 +19,15 @@ export const updateRecipe = async (id, recipe, username) => {
     method: "PUT",
     body: JSON.stringify(recipe),
     headers: {
-      "content-type": "application/json"
-    }
+      "content-type": "application/json",
+    },
   });
   return await response.json();
 };
 
 export const deleteRecipe = async (id, username) => {
   const response = await fetch(`${API_URL}/users/${username}/recipes/${id}`, {
-    method: "DELETE"
+    method: "DELETE",
   });
   return await response.json();
 };
@@ -35,12 +35,26 @@ export const deleteRecipe = async (id, username) => {
 export const findAllIngredientsForRecipe = async (recipeId) => {
   const response = await fetch(`${API_URL}/recipes/${recipeId}/ingredients`);
   return await response.json();
-}
+};
 
-export const addIngredientToRecipe = async (recipeId, ingredient) => 
+export const addIngredientToRecipe = async (recipeId, ingredient) =>
   fetch(`${API_URL}/recipes/${recipeId}/ingredients`, {
     method: "POST",
     body: JSON.stringify(ingredient),
+    headers: {
+      "content-type": "application/json",
+    },
+  }).then((response) => response.json());
+
+export const findAvailableRecipesForUser = async (username) => {
+  const response = await fetch(`${API_URL}/users/${username}/availablerecipes`);
+  return await response.json();
+};
+
+export const createFavoriteRecipe = async (recipe, username) =>
+  fetch(`${API_URL}/user/${username}/favoriterecipes`, {
+    method: "POST",
+    body: JSON.stringify(recipe),
     headers: {
       "content-type": "application/json",
     },
