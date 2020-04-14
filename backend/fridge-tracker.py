@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, url_for, jsonify
+from flask import Flask, request, redirect, url_for, jsonify, abort, render_template
 from flask_mysqldb import MySQL
 from flask_cors import CORS, cross_origin
 from flask.json import JSONEncoder
@@ -49,6 +49,13 @@ def hello_world():
     cur.execute("SELECT * FROM users")
     return getJSON(cur)
 
+def isEmpty(obj):
+    for key in obj:
+        if(obj.hasOwnProperty(key)):
+            return false
+    return true
+
+
 # Create user: POST: /api/users
 # Find users: GET: /api/users
 @app.route('/api/users', methods=['GET', 'POST'])
@@ -61,13 +68,23 @@ def users():
     if (request.method == 'POST'):
         user = request.get_json()
         cur = mysql.connection.cursor()
-        ins_st = '''INSERT INTO users (username, password) VALUES ('{}', '{}')'''.format(user['username'], user['password'])
-        print(ins_st)
-        cur.execute(ins_st)
+        
+        #ERROR HANDLING: testing for if username is already in the table
+        testCur = mysql.connection.cursor()
+        testCur.execute("SELECT * FROM users WHERE username='{}'".format(user['username']))
+        data = testCur.fetchall()
+        if (not (data)):
 
-        mysql.connection.commit()
-        cur.close()
-        return user
+            ins_st = '''INSERT INTO users (username, password) VALUES ('{}', '{}')'''.format(user['username'], user['password'])
+            print(ins_st)
+            cur.execute(ins_st)
+
+            mysql.connection.commit()
+            cur.close()
+            return user
+        #ERROR HANDLING: return an Unprocessable Entity status code if username is already in DataBase
+        else:
+            return ("Unprocessable Entity", 422)
 
 @app.route('/api/users/<username>', methods=['GET'])
 def getUser(username):
@@ -86,8 +103,9 @@ def ingredients():
     if (request.method == 'POST'):
         ingredient = request.get_json()
         cur = mysql.connection.cursor()
+
         ins_st = '''INSERT INTO ingredients (name, expiration_time_days) VALUES ('{}', '{}')'''\
-            .format(ingredient['name'], ingredient['expiration_time_days'])
+        .format(ingredient['name'], ingredient['expiration_time_days'])
         print(ins_st)
         cur.execute(ins_st)
 
@@ -134,15 +152,26 @@ def fridge(username):
     if (request.method == 'POST'):
         ingredient = request.get_json()
         cur = mysql.connection.cursor()
-        ins_st = '''INSERT INTO user_ingredients (username, ingredient_id, quantity, expiration_date) 
-            VALUES ('{}', {}, {}, '{}')'''\
-            .format(username, ingredient['ingredient_id'], ingredient['quantity'], ingredient['expiration_date'])
-        print(ins_st)
-        cur.execute(ins_st)
 
-        mysql.connection.commit()
-        cur.close()
-        return ingredient
+        #ERROR HANDLING: testing for if user_ingredient is already in the table
+        testCur = mysql.connection.cursor()
+        testCur.execute("SELECT * FROM user_ingredients WHERE ingredient_id='{}' AND username='{}'".format(ingredient['ingredient_id'], username))
+        data = testCur.fetchall()
+        if (not (data)):
+
+            ins_st = '''INSERT INTO user_ingredients (username, ingredient_id, quantity, expiration_date) 
+                VALUES ('{}', {}, {}, '{}')'''\
+                .format(username, ingredient['ingredient_id'], ingredient['quantity'], ingredient['expiration_date'])
+            print(ins_st)
+            cur.execute(ins_st)
+
+            mysql.connection.commit()
+            cur.close()
+            return ingredient
+
+        #ERROR HANDLING: return an Unprocessable Entity status code if user_ingredient is already in DataBase
+        else:
+            return ("Unprocessable Entity", 422)        
 
 # Update fridge ingredient: PUT: /api/users/:username/ingredients/:iid
 # Delete fridge ingredient: DELETE: /api/users/:username/ingredients/:iid
@@ -234,15 +263,26 @@ def recipeIngredients(recipe_id):
     if (request.method == 'POST'):
         ingredient = request.get_json()
         cur = mysql.connection.cursor()
-        ins_st = '''INSERT INTO recipe_ingredients (ingredient_id, recipe_id, amount) 
-            VALUES ({}, {}, {})'''\
-            .format(ingredient['ingredient_id'], recipe_id, ingredient['amount'])
-        print(ins_st)
-        cur.execute(ins_st)
 
-        mysql.connection.commit()
-        cur.close()
-        return ingredient
+        #ERROR HANDLING: testing for if user_ingredient is already in the table
+        testCur = mysql.connection.cursor()
+        testCur.execute("SELECT * FROM recipe_ingredients WHERE ingredient_id='{}' AND recipe_id='{}'".format(ingredient['ingredient_id'], recipe_id))
+        data = testCur.fetchall()
+        if (not (data)):
+
+            ins_st = '''INSERT INTO recipe_ingredients (ingredient_id, recipe_id, amount) 
+                VALUES ({}, {}, {})'''\
+                .format(ingredient['ingredient_id'], recipe_id, ingredient['amount'])
+            print(ins_st)
+            cur.execute(ins_st)
+
+            mysql.connection.commit()
+            cur.close()
+            return ingredient
+
+        #ERROR HANDLING: return an Unprocessable Entity status code if user_ingredient is already in DataBase
+        else:
+            return ("Unprocessable Entity", 422)
 
 # Update recipe ingredient: PUT: /api/recipes/:rid/ingredients/:iid
 # Delete recipe ingredient: DELETE: /api/recipes/:rid/ingredients/:iid
@@ -272,21 +312,51 @@ def recipeIngredientsId(recipe_id, ingredient_id):
         cur.close()
         return jsonify(data)
 
-# Add ingredient to recipe: POST: /api/recipes/:rid/ingredients
-# Get recipe ingredients: GET: /api/recipes/:rid/ingredients
+# Get available recipes: GET: /api/users/:uid/availablerecipes
 @app.route('/api/users/<username>/availablerecipes', methods=['GET'])
 def availableRecipes(username):
     cur = mysql.connection.cursor()
     cur.execute("CALL makeable_recipes('{}')".format(username))
     return getJSON(cur)
 
-# Add ingredient to recipe: POST: /api/recipes/:rid/ingredients
 # Get recipe ingredients: GET: /api/recipes/:rid/ingredients
 @app.route('/api/recipes/<recipeId>/ingredients', methods=['GET'])
 def recipeIngredientList(recipeId):
     cur = mysql.connection.cursor()
     cur.execute("CALL recipes_ingredient_list({})".format(recipeId))
     return getJSON(cur)
+
+# Add recipe to the user's favorite_recipes: POST: /api/users/:uid/favoriterecipes
+# Get user's favorite recipes: GET: /api/users/:uid/favoriterecipes
+@app.route('/api/users/<username>/favoriterecipes', methods=['GET', 'POST'])
+def favoriteRecipes(username):
+    if (request.method == 'GET'):
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM favorite_recipes WHERE user_id={}".format(recipe_id))
+        return getJSON(cur)
+    if (request.method == 'POST'):
+        recipe = request.get_json()
+        cur = mysql.connection.cursor()
+
+        #ERROR HANDLING: testing for if user_ingredient is already in the table
+        testCur = mysql.connection.cursor()
+        testCur.execute("SELECT * FROM favorite_recipes WHERE recipe_id='{}' AND user_id='{}'".format(recipe['recipe_id'], username))
+        data = testCur.fetchall()
+        if (not (data)):
+
+            ins_st = '''INSERT INTO favorite_recipes (recipe_id, user_id) 
+                VALUES ({}, {})'''\
+                .format(recipe['recipe_id'], username)
+            print(ins_st)
+            cur.execute(ins_st)
+
+            mysql.connection.commit()
+            cur.close()
+            return recipe
+
+        #ERROR HANDLING: return an Unprocessable Entity status code if user_ingredient is already in DataBase
+        else:
+            return ("Unprocessable Entity", 422)
     
 
 if __name__ == '__main__':
