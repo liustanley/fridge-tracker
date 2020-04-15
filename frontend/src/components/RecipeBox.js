@@ -26,7 +26,7 @@ class RecipeBox extends React.Component {
         <ul>
           {this.state.recipeIngredients.map((ingredient) => {
             return (
-              <li key={ingredient.ingredient_id}>{ingredient.ingredient_id}</li>
+              <li key={ingredient.ingredient_id}>{ingredient.name}</li>
             );
           })}
         </ul>

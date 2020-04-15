@@ -81,7 +81,7 @@ class RecipeEditMode extends React.Component {
               {this.state.recipeIngredients.map((ingredient) => {
                 return (
                   <li key={ingredient.ingredient_id}>
-                    {ingredient.ingredient_id}
+                    {ingredient.name}
                   </li>
                 );
               })}
