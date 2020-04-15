@@ -72,7 +72,8 @@ INSERT INTO users (username, password) VALUES
 	('mollybaz', 'password123'),
 	('andybaraghani', 'andyspassword'),
 	('stanleyliu', 'password'),
-	('milesbarker', 'password1');
+	('milesbarker', 'password1'),
+    ('gordonramsay', 'whereisthelambsauce');
 
 INSERT INTO ingredients (ingredient_id, name, expiration_time_days) VALUES
 	(1, 'olive oil', 1095),

@@ -88,7 +88,7 @@ class MainPage extends React.Component {
           </Link>
         </nav>
         <div className="container">
-          <div class="row">
+          <div class="row mb-5">
             <div class="mr-5">
               <IngredientList
                 refreshIngredients={this.refreshIngredients}
