@@ -1,5 +1,5 @@
 # fridge-tracker
-## CS3200 Final Project by Stanley Liu and Miles Barker
+ CS3200 Final Project by Stanley Liu and Miles Barker
 
 # Installation Instructions
 
