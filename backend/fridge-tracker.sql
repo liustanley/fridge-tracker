@@ -23,6 +23,9 @@ CREATE TABLE IF NOT EXISTS user_ingredients (
     PRIMARY KEY (username, ingredient_id),
     CONSTRAINT username_fk FOREIGN KEY (username) REFERENCES users (username)
 		ON DELETE CASCADE
+        ON UPDATE CASCADE,
+	CONSTRAINT ingredientid_fk FOREIGN KEY (ingredient_id) REFERENCES ingredients (ingredient_id)
+		ON DELETE CASCADE
         ON UPDATE CASCADE
 );
 
@@ -186,4 +189,4 @@ BEGIN
 SELECT ingredients.name, recipe_ingredients.ingredient_id, recipe_ingredients.recipe_id, recipe_ingredients.amount FROM ingredients NATURAL JOIN recipe_ingredients
 WHERE recipe_id = input_recipe_id;
 END
-//
+//  

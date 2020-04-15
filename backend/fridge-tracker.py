@@ -49,13 +49,6 @@ def hello_world():
     cur.execute("SELECT * FROM users")
     return getJSON(cur)
 
-def isEmpty(obj):
-    for key in obj:
-        if(obj.hasOwnProperty(key)):
-            return false
-    return true
-
-
 # Create user: POST: /api/users
 # Find users: GET: /api/users
 @app.route('/api/users', methods=['GET', 'POST'])
@@ -258,7 +251,7 @@ def recipesId(username, recipe_id):
 def recipeIngredients(recipe_id):
     if (request.method == 'GET'):
         cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM recipe_ingredients WHERE recipe_id={}".format(recipe_id))
+        cur.execute("CALL recipes_ingredient_list({})".format(recipe_id))
         return getJSON(cur)
     if (request.method == 'POST'):
         ingredient = request.get_json()
@@ -320,7 +313,7 @@ def availableRecipes(username):
     return getJSON(cur)
 
 # Get recipe ingredients: GET: /api/recipes/:rid/ingredients
-@app.route('/api/recipes/<recipeId>/ingredients', methods=['GET'])
+@app.route('/api/recipes/<recipeId>/ingredients_with_names', methods=['GET'])
 def recipeIngredientList(recipeId):
     cur = mysql.connection.cursor()
     cur.execute("CALL recipes_ingredient_list({})".format(recipeId))
